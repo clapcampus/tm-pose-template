@@ -1,343 +1,364 @@
-# Teachable Machine Pose Model Template
+# Teachable Machine Pose Game Template  
+**AI를 직접 배우고, 직접 만들어보는 ‘바이브 코딩 실습’ 프로젝트**
 
-Teachable Machine에서 학습한 Pose 모델을 웹에서 테스트할 수 있는 템플릿입니다.
+이 템플릿은 학생들이 **포즈 인식 AI 모델을 직접 학습하고**, 그 모델을 기반으로  
+**나만의 포즈 게임 웹앱을 만드는 전 과정**을 경험할 수 있도록 설계된 교육용 프로젝트입니다.
+
+- 📌 AI가 어떻게 학습되는지 실습 중심으로 이해하고  
+- 🎮 게임 형태로 AI를 응용해 실제로 동작하는 결과물을 만들고  
+- 🤖 AI 코딩 도구(Claude Code, Cursor, GitHub Copilot 등)와 협업하며  
+- 🧠 데이터 수집 → 모델 학습 → 게임 구현 → 배포까지 전체 AI 개발 사이클을 체험  
+
+AI와 친숙해지고, “AI에게 잘 요청하는 법”까지 배우는 실습 중심 템플릿입니다.
+
+---
 
 ## 📋 개요
 
-이 프로젝트는 학생들이 [Teachable Machine](https://teachablemachine.withgoogle.com/)에서 포즈 인식 모델을 학습한 후, 해당 모델을 GitHub에 업로드하고 GitHub Pages를 통해 실시간으로 테스트할 수 있도록 만들어진 템플릿입니다.
+**Teachable Machine에서 학습한 포즈 인식 모델을 활용해서 포즈 게임 웹앱을 만들 수 있도록 만든 템플릿입니다.**
 
-### 현재 포함된 예시 모델
+기본 예시로 '얼굴 방향 인식 모델'이 포함되어 있으며,  
+학습한 모델 파일만 교체하면 바로 자신만의 포즈 게임으로 확장 가능합니다.
 
-이 저장소에는 **얼굴 방향 인식 모델**이 포함되어 있습니다:
-- **왼쪽**: 얼굴이 왼쪽을 바라볼 때
-- **오른쪽**: 얼굴이 오른쪽을 바라볼 때
-- **정면**: 얼굴이 정면을 바라볼 때
-- **위**: 얼굴이 위를 바라볼 때
-- **아래**: 얼굴이 아래를 바라볼 때
+---
 
-이 모델은 데모용이며, 자신만의 포즈 인식 모델로 교체하여 사용할 수 있습니다.
+# 🎮 포즈 게임 만들기 워크플로우 (핵심 단계)
 
-## 🚀 사용 방법
+포즈 게임 제작 과정은 아래 세 단계로 구성됩니다.  
+이 흐름을 따라가면 **모델 학습 → 규칙 설계 → 게임 완성**까지 차근차근 진행할 수 있습니다.
 
-### 1. Teachable Machine에서 모델 학습 및 다운로드
+---
 
-1. [Teachable Machine](https://teachablemachine.withgoogle.com/)에 접속
-2. "Pose Project" 선택
-3. 원하는 포즈들을 학습
-4. "Export Model" → "Download" 선택하여 모델 파일 다운로드
+# 🔥 Step 1 — GAME_RULE.md 작성 (게임 기획)
 
-### 2. 모델 파일 추가
+게임 제작의 첫 단계는 **GAME_RULE.md 파일 작성**입니다.  
+이 문서는 게임 개발의 기준이 되며, 이후 AI 코딩 도구가 코드를 생성할 때 가장 중요한 참고 문서입니다.
 
-다운로드한 모델 파일을 `my_model/` 폴더에 넣어주세요:
-- `my_model/model.json`
-- `my_model/weights.bin`
-- `my_model/metadata.json`
+GAME_RULE.md에는 아래 항목을 포함합니다:
 
-### 3. 로컬에서 테스트
+- 게임 제목  
+- 게임 설명  
+- 구역 정의  
+- 조작 방식  
+- 아이템 종류  
+- 점수 규칙  
+- 게임 오버 조건  
+- 레벨 시스템  
+- UI 요소  
 
-브라우저 보안 정책으로 인해 로컬 웹 서버가 필요합니다.
+### ✨ 예시 게임: Catch Zone
 
-**Python 사용 (Python 3):**
-```bash
-python3 -m http.server 8000
+다음과 같은 규칙으로 구성된 게임을 GAME_RULE.md로 작성할 수 있습니다:
+
 ```
 
-**Node.js 사용:**
+게임 이름: Catch Zone
+
+기본 구조:
+
+* 화면은 LEFT / CENTER / RIGHT 3개 구역으로 구성된다.
+* 플레이어는 포즈 인식으로 바구니를 조작한다.
+
+  * 왼쪽 포즈 → LEFT
+  * 중립 포즈 → CENTER
+  * 오른쪽 포즈 → RIGHT
+
+아이템 종류:
+
+1. 폭탄(Bomb) → 닿으면 즉시 게임 오버
+2. 사과(Apple) → +100점
+3. 배(Pear) → +150점
+4. 오렌지(Orange) → +200점
+
+그 외:
+
+* 과일 놓침 2번 시 게임 오버
+* 20초마다 레벨 증가 (아이템 속도 증가)
+
+```
+
+---
+
+# 🔥 Step 2 — Teachable Machine에서 포즈 모델 학습
+
+GAME_RULE.md에서 정의한 포즈 목록에 맞춰 모델을 학습합니다.
+
+### ✔️ 학습 절차
+
+1. https://teachablemachine.withgoogle.com 접속  
+2. Pose Project 생성  
+3. 포즈 클래스 생성 (예: LEFT, CENTER, RIGHT)  
+4. 각 클래스 최소 50개 이상 데이터 수집  
+5. 모델 학습  
+6. Export → Download  
+7. 다운로드한 모델 파일을 `my_model/`에 배치  
+
+```
+
+my_model/
+├── model.json
+├── metadata.json
+└── weights.bin
+
+````
+
+### ⚠️ metadata.json 클래스 라벨 확인 (필수)
+`metadata.json` 파일의 `"labels"` 배열이 GAME_RULE.md의 포즈 이름과 일치해야 합니다.
+
+예:
+```json
+{
+  "labels": ["LEFT", "CENTER", "RIGHT"]
+}
+````
+
+불일치 시:
+
+* GAME_RULE.md를 수정하거나
+* 라벨 매핑 테이블을 만들어 코드에서 처리해야 함
+
+---
+
+# 🔥 Step 3 — 게임 로직 구현
+
+(📌 AI 바이브 코딩 방식으로 개발)
+
+포즈 게임을 개발할 때 중요한 것은 **AI에게 어떤 방식으로 작업을 요청하느냐**입니다.
+한 번에 코드를 만들어달라고 하면 오류가 많아지므로,
+**검증 가능한 작은 단위로 분리하여 요청**해야 합니다.
+
+## 🧩 1) "검증 가능한 단위"로 AI에게 요청하기
+
+* ❌ “게임 전체 만들어줘”
+  → 오류 많고 디버깅 어렵다
+* ⭕ “템플릿 구조를 분석해줘”
+* ⭕ “수정해야 할 파일과 이유를 정리해줘”
+* ⭕ “gameEngine.js 스켈레톤 버전만 먼저 만들어줘”
+* ⭕ “아이템 낙하 로직만 구현해줘”
+
+이런 방식으로 지시해야 오류를 초기에 잡고 개발을 안정적으로 진행할 수 있습니다.
+
+---
+
+## 🧩 2) 방법 A — "계획 → 설계 → 구현 → 테스트" 단계로 진행
+
+### 1단계: 템플릿 구조 분석 요청
+
+먼저 AI에게 템플릿 파일 구조를 요약하게 합니다.
+
+```
+우선 README를 읽고 tm-pose-template 구조를 분석해줘.
+각 JS 파일의 역할을 정리하고,
+이번 게임을 만들기 위해 어떤 파일을 어떻게 수정해야 할지 계획을 세워줘.
+```
+
+### 2단계: GAME_RULE.md 정리
+
+게임 규칙을 파일로 정리시켜 AI가 참고할 기준을 고정합니다.
+
+### 3단계: 개발 계획 수립
+
+AI에게 "어떤 파일을 어떤 순서로 수정할지" 계획을 먼저 세우게 합니다.
+
+### 4단계: 구현 시작
+
+계획이 정리되면 실제 구현을 요청합니다.
+
+---
+
+## 🧩 3) 방법 B — 스켈레톤(껍데기) 먼저 만들고 완성시키기
+
+빠르게 결과물이 필요할 경우:
+
+```
+게임 UI와 흐름만 있는 스켈레톤 버전을 먼저 만들어줘.
+충돌 처리/점수 계산은 TODO 주석으로 남겨줘.
+```
+
+이후 기능을 분리해 하나씩 요청합니다.
+
+---
+
+## 🧩 4) 전체 개발 프롬프트 흐름 예시
+
+(README에서 권장하는 공식 절차)
+
+### ✔ 1) 템플릿 구조 인식
+
+```
+README를 읽고 전체 구조를 분석해줘.
+각 파일의 역할과 수정해야 할 부분을 정리해줘.
+```
+
+### ✔ 2) GAME_RULE.md 작성
+
+```
+Catch Zone 게임 규칙을 기반으로 GAME_RULE.md 파일을 작성해줘.
+완료되면 "GAME_RULE.md 작성 완료"라고 말해줘.
+```
+
+### ✔ 3) Git 업데이트
+
+```
+지금까지 작성한 내용을 git에 반영해줘.
+```
+
+### ✔ 4) TM 모델 학습 대기
+
+```
+이제 내가 Teachable Machine에서 모델을 학습할게.
+기다렸다가 다음 단계로 넘어가줘.
+```
+
+### ✔ 5) 모델 검증
+
+```
+모델 파일을 my_model/에 넣었어.
+metadata.json의 labels를 확인하고 GAME_RULE.md와 일치하는지 검증해줘.
+```
+
+### ✔ 6) 기본 게임 구현
+
+```
+이제 개발을 시작해줘.
+
+1. 템플릿 구조를 유지하고
+2. GAME_RULE.md 규칙을 반영해서
+3. 기본적으로 동작하는 게임 버전을 만들어줘.
+
+한국어 주석을 자세히 달아줘.
+```
+
+### ✔ 7) 테스트 후 수정 요청
+
+내가 테스트하면서 문제를 알려주면:
+
+```
+바구니가 오른쪽으로 너무 천천히 움직여. 속도를 조금 올려줘.
+```
+
+AI는 해당 부분 코드만 정확히 수정해서 보여줍니다.
+
+---
+
+# 📦 (부록) 프로젝트 실행 안내
+
+(워크플로우 Step 1~3을 완료한 뒤 참고)
+
+---
+
+## 🚀 로컬에서 실행하기
+
+브라우저 보안 정책 때문에 `index.html` 파일을 더블클릭해서 열면  
+모델 파일(`model.json`, `weights.bin`)이 로딩되지 않습니다.  
+반드시 **로컬 웹 서버**를 통해 실행해야 합니다.
+
+가장 쉬운 방법은 **VS Code의 Live Server 확장 프로그램**을 사용하는 것입니다.
+
+---
+
+### ✔️ 방법 1: VS Code — Live Server 사용 (가장 쉬움, 권장)
+
+1. VS Code 실행  
+2. 좌측 Extensions(확장) 탭 클릭  
+3. “**Live Server**” 검색  
+4. 설치(Install)  
+5. `tm-pose-template` 폴더를 VS Code로 열기  
+6. `index.html` 파일을 우클릭 → **“Open with Live Server”** 선택  
+7. 브라우저가 자동으로 열리며 다음과 같은 주소로 접속됨:
+
+```
+
+[http://127.0.0.1:5500/](http://127.0.0.1:5500/)
+
+```
+
+또는:
+
+```
+
+[http://localhost:5500/](http://localhost:5500/)
+
+````
+
+이제 웹캠 권한을 허용하면 포즈 모델이 정상적으로 로딩되며  
+게임 또는 모델 테스트가 가능합니다.
+
+---
+
+### ✔️ 방법 2: Python 로컬 서버 실행
+
+```bash
+python3 -m http.server 8000
+````
+
+접속:
+
+```
+http://localhost:8000
+```
+
+---
+
+### ✔️ 방법 3: Node.js http-server 실행
+
 ```bash
 npx http-server -p 8000
 ```
 
-**VS Code 사용:**
-- Live Server 확장 프로그램 설치
-- index.html 우클릭 → "Open with Live Server"
+접속:
 
-브라우저에서 `http://localhost:8000` 접속
+```
+http://localhost:8000
+```
 
-### 4. GitHub Pages로 배포
+---
 
-1. 이 저장소를 자신의 GitHub 계정으로 Fork 또는 복사
-2. 모델 파일을 `my_model/` 폴더에 추가
-3. GitHub 저장소 설정에서 Pages 활성화:
-   - Settings → Pages
-   - Source: Deploy from a branch
-   - Branch: main / (root) 선택
-   - Save
-4. 몇 분 후 `https://<username>.github.io/<repository-name>/`에서 접속 가능
+## 🌐 GitHub Pages 배포
 
-## ✨ 주요 기능
+1. 저장소 Fork
+2. 모델 파일을 `my_model/`에 넣기
+3. GitHub에 push
+4. Settings → Pages
+5. Deploy from branch
+6. 자동 생성된 URL로 접속
 
-- ✅ 실시간 웹캠 포즈 인식
-- ✅ 포즈 스켈레톤 및 키포인트 시각화
-- ✅ 예측 결과 확률 표시
-- ✅ 최고 확률 클래스 강조 표시
-- ✅ Start/Stop 버튼으로 웹캠 제어
-
-## 🛠 기술 스택
-
-- TensorFlow.js 1.3.1
-- Teachable Machine Pose Library 0.8
-- Vanilla JavaScript
-- HTML5 Canvas
+---
 
 ## 📁 프로젝트 구조
 
 ```
 tm-pose-template/
-├── index.html              # 화면 구조와 JS/CSS를 불러오는 앱의 엔트리 HTML
+├── index.html              # 웹앱 엔트리
 ├── css/
-│   └── style.css          # 페이지 전체 스타일과 게임 UI 디자인
+│   └── style.css           # 전체 UI/레이아웃
 ├── js/
-│   ├── main.js            # 포즈 인식과 게임 로직을 초기화하고 서로 연결하는 진입점
-│   ├── poseEngine.js      # 웹캠 + TM 포즈 모델 로딩 및 예측(label) 생성 담당
-│   ├── gameEngine.js      # 게임 단계, 명령, 점수, 제한시간 등 게임 규칙 전체를 담당
-│   └── stabilizer.js      # 예측값을 안정화(히스테리시스/필터링)해 튀는 오류를 줄임
-├── my_model/              # Teachable Machine 모델 파일 위치
-│   ├── model.json         # TM에서 학습한 포즈 모델의 구조(네트워크 아키텍처) 정보
-│   ├── metadata.json      # 클래스 이름 등 모델 메타데이터 정보
-│   └── weights.bin        # 포즈 모델이 학습한 실제 가중치 데이터
-├── GAME_RULE.md           # 🎮 게임 규칙 정의 파일 (AI 코딩 시 참고)
-└── README.md
+│   ├── main.js             # 초기화 및 전체 연결
+│   ├── poseEngine.js       # 포즈 인식 + 웹캠 처리
+│   ├── gameEngine.js       # 게임 규칙 및 상태 머신
+│   └── stabilizer.js       # 예측 안정화 필터
+├── my_model/               # Teachable Machine 모델 파일
+└── GAME_RULE.md            # 게임 규칙 정의 파일
 ```
 
-### 파일 설명
+---
 
-#### `GAME_RULE.md` 🎮
-- **게임 규칙 정의 파일**
-- 게임 제목, 설명, 목표, 점수 체계, 필요한 포즈 등을 구조화하여 작성
-- AI 코딩 도구(Claude Code, Cursor 등)가 이 파일을 읽고 자동으로 게임 코드 생성
-- 게임 개발 시 가장 먼저 작성해야 하는 파일
-- 템플릿 형식으로 제공되어 쉽게 작성 가능
+# 👨‍🏫 교육 활용 포인트
 
-#### `js/main.js`
-- 애플리케이션의 진입점
-- PoseEngine, GameEngine, Stabilizer를 초기화하고 연결
-- 웹캠과 캔버스 설정
-- UI 이벤트 처리 (Start/Stop 버튼)
+* AI 개념을 실습 기반으로 자연스럽게 이해
+* 포즈 인식 모델을 직접 만들고 활용
+* HTML/CSS/JS로 웹 개발 경험
+* AI 코딩 도구(바이브 코딩) 활용 능력 향상
+* Git/GitHub 협업 및 배포까지 경험
+* 교육·캠프·동아리·방과후 수업에 최적화
 
-#### `js/poseEngine.js`
-- Teachable Machine 포즈 모델 로드
-- 웹캠 스트림 관리
-- 실시간 포즈 예측 수행
-- 포즈 스켈레톤 및 키포인트 그리기
+---
 
-#### `js/gameEngine.js`
-- 게임 로직 관리 (선택적 기능)
-- 점수, 레벨, 타이머 관리
-- 게임 명령 발급 및 검증
-- 향후 게임 확장을 위한 기반 제공
+# 👨‍💻 만든 사람
 
-#### `js/stabilizer.js`
-- 예측 결과 안정화
-- 히스테리시스 필터링으로 순간적인 오인식 방지
-- 예측 확률 임계값 처리
-- 최빈값 기반 평활화
+**Sangbong Lee (이상봉)**
+Email: [ideabong@clapcampus.kr](mailto:ideabong@clapcampus.kr)
 
-## 🎮 포즈 게임 만들기
+---
 
-이 템플릿을 활용하여 자신만의 포즈 인식 게임을 만들 수 있습니다. 다음 3단계 워크플로우를 따라주세요:
-
-### Step 1: 게임 규칙 설계 - GAME_RULE.md 작성
-
-먼저 만들고자 하는 게임의 규칙을 설계합니다. [GAME_RULE.md](GAME_RULE.md) 파일을 열어 템플릿을 따라 작성하세요.
-
-**GAME_RULE.md에 포함할 내용:**
-- ✅ 게임 제목과 설명
-- ✅ 게임 목표와 기본 규칙
-- ✅ 필요한 포즈 목록 (Teachable Machine 클래스)
-- ✅ 점수 체계 (점수 획득/차감 규칙)
-- ✅ 시간 설정 (제한시간, 명령 속도 등)
-- ✅ 추가 기능 (선택사항)
-
-**예시 게임 규칙:**
-```markdown
-# 게임 제목: 얼굴 방향 따라하기
-
-## 게임 규칙
-- 화면에 랜덤하게 방향이 표시됩니다
-- 제한시간 내에 해당 방향으로 얼굴을 돌리세요
-- 정확한 포즈: +10점
-- 60초 동안 최대한 높은 점수를 획득하세요!
-
-## 필요한 포즈
-왼쪽, 오른쪽, 위, 아래, 정면
-```
-
-> 💡 **Tip**: GAME_RULE.md를 먼저 작성하면 AI 코딩 도구(Claude Code, Cursor 등)가 게임 규칙을 이해하고 더 정확한 코드를 생성할 수 있습니다!
-
-### Step 2: Teachable Machine - 포즈 모델 학습
-
-[GAME_RULE.md](GAME_RULE.md)에서 정의한 포즈들을 Teachable Machine에서 학습합니다.
-
-**학습 단계:**
-
-1. **Teachable Machine 접속**
-   - [https://teachablemachine.withgoogle.com/](https://teachablemachine.withgoogle.com/)
-   - "Pose Project" 선택
-
-2. **클래스 생성**
-   - GAME_RULE.md의 "필요한 포즈 목록"을 참고하여 각 포즈마다 클래스 생성
-   - 예: "왼쪽", "오른쪽", "위", "아래", "정면"
-
-3. **샘플 수집**
-   - 각 클래스마다 웹캠으로 포즈 샘플 수집 (최소 50개 이상 권장)
-   - 다양한 각도와 거리에서 촬영하여 정확도 향상
-   - 배경이 다른 환경에서도 테스트
-
-4. **모델 학습**
-   - "Train Model" 버튼 클릭
-   - 학습이 완료될 때까지 대기
-
-5. **모델 다운로드**
-   - "Export Model" 클릭
-   - "Download" 탭 선택
-   - "Download my model" 버튼 클릭하여 파일 다운로드
-
-6. **모델 파일 배치**
-   - 다운로드한 파일의 압축을 풀어 `my_model/` 폴더에 배치
-   ```
-   my_model/
-   ├── model.json
-   ├── metadata.json
-   └── weights.bin
-   ```
-
-7. **⚠️ metadata.json 클래스 라벨 확인 (중요!)**
-   - `my_model/metadata.json` 파일을 열어서 학습된 클래스 라벨 확인
-   - 파일 내용 예시:
-   ```json
-   {
-     "labels": ["왼쪽", "오른쪽", "정면", "위", "아래"],
-     ...
-   }
-   ```
-   - **이 라벨 정보를 기준으로 게임 코드를 작성해야 합니다!**
-   - GAME_RULE.md의 "필요한 포즈 목록"과 일치하는지 확인
-   - 불일치하면 게임이 제대로 작동하지 않을 수 있음
-
-> 💡 **Tip**: GAME_RULE.md에 정의한 포즈 목록을 보면서 학습하면 누락 없이 모든 포즈를 학습할 수 있습니다!
-
-### Step 3: 게임 로직 구현
-
-[GAME_RULE.md](GAME_RULE.md)에 정의한 게임 규칙을 코드로 구현합니다.
-
-**🤖 AI 코딩 도구 활용 (권장)**
-
-Claude Code, Cursor, GitHub Copilot 등의 AI 도구를 사용하면 쉽게 구현할 수 있습니다:
-
-**Step 3-1: metadata.json 라벨 확인**
-
-먼저 `my_model/metadata.json` 파일을 열어 실제 라벨을 확인합니다:
-```json
-{
-  "labels": ["왼쪽", "오른쪽", "정면", "위", "아래"],
-  ...
-}
-```
-
-**Step 3-2: 라벨 불일치 시 대응**
-
-만약 metadata.json의 라벨과 GAME_RULE.md의 포즈 목록이 다른 경우:
-
-- **옵션 A (권장)**: metadata.json 기준으로 GAME_RULE.md 수정
-- **옵션 B**: GAME_RULE.md에 라벨 매핑 테이블 작성 (상세 내용은 GAME_RULE.md 참고)
-
-**Step 3-3: AI에게 코드 생성 요청**
-
-```
-💬 AI에게 요청하는 방법:
-
-"my_model/metadata.json 파일의 labels 항목을 확인해서
-실제 클래스 라벨 이름을 파악해줘.
-
-그리고 GAME_RULE.md 파일을 읽고, 정의된 게임 규칙대로
-js/gameEngine.js와 js/main.js를 수정해줘.
-metadata.json의 정확한 라벨 이름을 사용해야 해.
-
-만약 GAME_RULE.md에 라벨 매핑 테이블이 있으면,
-코드에서는 metadata.json 라벨을 사용하고
-UI 표시는 매핑 테이블의 이름을 사용해줘.
-
-index.html과 css/style.css도 게임 UI를 추가해줘."
-```
-
-AI가 metadata.json과 GAME_RULE.md를 읽고 자동으로:
-- ✅ metadata.json의 정확한 클래스 라벨 확인 및 사용
-- ✅ 게임 타이머 설정
-- ✅ 점수 체계 구현
-- ✅ 명령 발급 로직 작성
-- ✅ UI 업데이트 코드 생성 (라벨 매핑 적용)
-- ✅ 스타일 적용
-
-**📝 직접 코딩하는 경우**
-
-[js/gameEngine.js](js/gameEngine.js)는 이미 기본적인 게임 프레임워크를 제공합니다:
-- ✅ 점수 관리 (`score`, `addScore()`)
-- ✅ 레벨 시스템 (`level`)
-- ✅ 타이머 기능 (`timeLimit`, `startTimer()`)
-- ✅ 게임 명령 발급 (`issueNewCommand()`)
-- ✅ 포즈 감지 처리 (`onPoseDetected()`)
-
-**커스터마이징 예시:**
-
-```javascript
-// js/main.js에서 게임 모드 활성화
-async function init() {
-  // ... 기존 초기화 코드 ...
-
-  // ⚠️ 중요: metadata.json의 정확한 라벨 이름 사용
-  // metadata.json 확인: ["왼쪽", "오른쪽", "정면", "위", "아래"]
-  startGameMode({
-    timeLimit: 60,  // GAME_RULE.md의 "시간 설정" 참고
-    commands: ["왼쪽", "오른쪽", "위", "아래"]  // metadata.json의 labels와 일치해야 함
-  });
-}
-```
-
-**게임 UI 추가:**
-
-[index.html](index.html)에 게임 UI 요소를 추가:
-```html
-<div id="game-info">
-  <div id="score">점수: 0</div>
-  <div id="timer">남은 시간: 60초</div>
-  <div id="command">명령: 왼쪽을 보세요!</div>
-</div>
-```
-
-**스타일 수정:**
-
-[css/style.css](css/style.css)에서 게임 UI 스타일 추가
-
-### 완성 후 테스트 및 배포
-
-1. **로컬 테스트**
-   ```bash
-   python3 -m http.server 8000
-   # 또는
-   npx http-server -p 8000
-   ```
-
-2. **GitHub Pages 배포**
-   - GitHub 저장소에 push
-   - Settings → Pages에서 배포 활성화
-   - 전 세계 누구나 접속 가능!
-
-## 🎓 교육 활용
-
-이 템플릿은 다음과 같은 교육 목적으로 활용할 수 있습니다:
-
-- 머신러닝/AI 기초 학습
-- 포즈 인식 기술 이해
-- 웹 개발 실습 (HTML/CSS/JavaScript)
-- 게임 로직 설계 및 구현
-- GitHub 및 버전 관리 학습
-- GitHub Pages를 통한 배포 경험
-
-## 👨‍💻 만든 사람
-
-**Sangbong Lee**
-- Email: ideabong@clapcampus.kr
-
-## 📝 라이선스
-
-이 프로젝트는 교육 목적으로 자유롭게 사용 가능합니다.
+이 템플릿은 교육 목적에 한해 자유롭게 활용할 수 있습니다.
