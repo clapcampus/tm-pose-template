@@ -336,7 +336,7 @@ async function init() {
 ## 👨‍💻 만든 사람
 
 **Sangbong Lee**
-- Email: idealbong@gmail.com
+- Email: ideabong@clapcampus.kr
 
 ## 📝 라이선스
 
