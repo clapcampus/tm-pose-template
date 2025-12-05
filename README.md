@@ -295,6 +295,3 @@ Email: [ideabong@clapcampus.kr](mailto:ideabong@clapcampus.kr)
 ---
 
 이 템플릿은 교육 목적에 한해 자유롭게 활용할 수 있습니다.
-
-도 가능합니다.
-```
