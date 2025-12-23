@@ -294,4 +294,13 @@ Email: [ideabong@clapcampus.kr](mailto:ideabong@clapcampus.kr)
 
 ---
 
-이 템플릿은 교육 목적에 한해 자유롭게 활용할 수 있습니다.
+## 라이선스 (License)
+
+이 프로젝트는 **개인적 및 비영리적 목적**으로만 사용이 가능합니다.
+
+개인 학습이나 비영리 프로젝트 용도로는 자유롭게 수정 및 배포할 수 있습니다.
+
+**영리 목적의 사용(유료 서비스, 광고 포함, 상용 제품 등)은 저작권자의 사전 서면 동의 없이는 엄격히 금지됩니다.**
+
+상업적 사용을 원하시는 경우, 아래 연락처로 문의해 주세요.
+**문의: [ideabong@clapcampus.kr](mailto:ideabong@clapcampus.kr)**
